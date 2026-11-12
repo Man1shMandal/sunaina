@@ -1,0 +1,11 @@
+{
+  "id": "demo_part",
+  "name": "Demo part",
+  "camera": { "autoexp": 1, "autogain": 1, "flash": 0 },
+  "servo": 90,
+  "locate": { "mode": "dark_on_light", "min_area": 0.02 },
+  "checks": [
+    { "name": "part present", "type": "present", "min": 0.03, "max": 0.6 },
+    { "name": "surface", "type": "anomaly", "roi": [80, 60, 160, 120], "cells": [8, 6], "z": 4.0 }
+  ]
+}

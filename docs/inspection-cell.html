@@ -1,0 +1,209 @@
+<title>Sunaina Inspection Cell</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one narrow engineering sheet. Side-view drawing first, then the sequence, parts and open questions. */
+:root {
+  --bg: #f3f4f2;
+  --sheet: #ffffff;
+  --ink: #1c2124;
+  --mute: #5f686d;
+  --line: #d5d9d8;
+  --belt: #3a4246;
+  --accent: #d4520f;
+  --accent-soft: rgba(212, 82, 15, 0.14);
+  --ghost: #aab2b4;
+  --font-display: "IBM Plex Sans Condensed", "Arial Narrow", sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #131718; --sheet: #1b2022; --ink: #e9ecec; --mute: #9aa4a7; --line: #2f3739;
+    --belt: #7b878b; --accent: #ff7a3d; --accent-soft: rgba(255, 122, 61, 0.18); --ghost: #4b5558;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #131718; --sheet: #1b2022; --ink: #e9ecec; --mute: #9aa4a7; --line: #2f3739;
+  --belt: #7b878b; --accent: #ff7a3d; --accent-soft: rgba(255, 122, 61, 0.18); --ghost: #4b5558;
+  color-scheme: dark;
+}
+body {
+  background: var(--bg); color: var(--ink);
+  font: 15px/1.55 var(--font-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 28px 48px;
+}
+main { max-width: 760px; margin: 0 auto; display: grid; gap: 28px; }
+h1, h2 { font-family: var(--font-display); font-weight: 600; text-wrap: balance; margin: 0; }
+h1 { font-size: 30px; line-height: 1.15; }
+h2 { font-size: 19px; margin-bottom: 10px; }
+.eyebrow { font: 500 12px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.lede { color: var(--mute); max-width: 62ch; margin: 6px 0 0; }
+section { min-width: 0; }
+
+.drawing { background: var(--sheet); border: 1px solid var(--line); border-radius: 10px; padding: 14px; display: grid; gap: 12px; }
+.svgwrap { overflow-x: auto; }
+svg { display: block; width: 100%; min-width: 360px; height: auto; }
+.poses { display: flex; gap: 6px; flex-wrap: wrap; }
+.poses button {
+  flex: 1; min-width: 90px; padding: 9px 10px; border-radius: 7px; cursor: pointer;
+  border: 1px solid var(--line); background: transparent; color: var(--ink);
+  font: 500 14px var(--font-body);
+}
+.poses button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+.poses button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.caption { margin: 0; color: var(--mute); font-size: 14px; }
+.caption b { color: var(--ink); font-weight: 500; }
+.mono { font-family: var(--font-mono); font-size: 13px; }
+
+#arm { transform-box: view-box; transform-origin: 290px 221px; transition: transform .9s cubic-bezier(.45,.05,.25,1); }
+@media (prefers-reduced-motion: reduce) { #arm { transition: none; } }
+
+ol.steps { margin: 0; padding-left: 22px; display: grid; gap: 6px; max-width: 64ch; }
+ol.steps li::marker { font-family: var(--font-mono); color: var(--accent); }
+
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 8px 10px 8px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font: 500 12px var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--mute); }
+td:first-child { white-space: nowrap; font-weight: 500; }
+.tbd { font: 500 11px var(--font-mono); color: var(--accent); border: 1px solid var(--accent); border-radius: 4px; padding: 0 5px; margin-left: 4px; }
+
+ul.questions { margin: 0; padding-left: 20px; display: grid; gap: 6px; max-width: 64ch; }
+.note { color: var(--mute); font-size: 14px; max-width: 64ch; margin: 10px 0 0; }
+</style>
+
+<main>
+  <header>
+    <div class="eyebrow">Project Sunaina · draft for discussion</div>
+    <h1>Sunaina inspection cell</h1>
+    <p class="lede">A conveyor brings each product to one spot. A servo arm swings the ESP32-CAM around it to take photos from above and from the front, and the ESP32-S3 decides PASS or FAIL.</p>
+  </header>
+
+  <section class="drawing" aria-label="Side view of the inspection cell">
+    <div class="poses" role="group" aria-label="Arm position">
+      <button id="p-back" aria-pressed="false" data-rot="-90">Back · 120°</button>
+      <button id="p-top" aria-pressed="true" data-rot="0">Top · 63°</button>
+      <button id="p-front" aria-pressed="false" data-rot="90">Front · 0°</button>
+    </div>
+    <div class="svgwrap">
+      <svg viewBox="0 0 600 340" role="img" aria-label="Side view: conveyor belt, product, servo beside the belt, arm with camera">
+        <!-- ground -->
+        <line x1="10" y1="322" x2="590" y2="322" style="stroke:var(--line)" stroke-width="2"/>
+        <!-- belt frame legs -->
+        <line x1="70" y1="276" x2="70" y2="322" style="stroke:var(--ghost)" stroke-width="4"/>
+        <line x1="530" y1="276" x2="530" y2="322" style="stroke:var(--ghost)" stroke-width="4"/>
+        <!-- belt -->
+        <rect x="30" y="262" width="540" height="14" rx="7" style="fill:var(--belt)"/>
+        <circle cx="44" cy="269" r="11" style="fill:var(--sheet);stroke:var(--belt)" stroke-width="3"/>
+        <circle cx="556" cy="269" r="11" style="fill:var(--sheet);stroke:var(--belt)" stroke-width="3"/>
+        <text x="300" y="300" text-anchor="middle" class="mono" style="fill:var(--mute)">belt direction  →</text>
+
+        <!-- servo stand, behind the belt -->
+        <line x1="290" y1="235" x2="290" y2="322" style="stroke:var(--ghost)" stroke-width="3" stroke-dasharray="5 4"/>
+
+        <!-- reference arcs: where the camera can go -->
+        <path d="M140 221 A150 150 0 0 1 440 221" style="fill:none;stroke:var(--ghost)" stroke-width="1.5" stroke-dasharray="3 5"/>
+        <text x="132" y="214" text-anchor="end" class="mono" style="fill:var(--mute)">back</text>
+        <text x="300" y="44" text-anchor="start" class="mono" style="fill:var(--mute)">top</text>
+        <text x="448" y="214" text-anchor="start" class="mono" style="fill:var(--mute)">front</text>
+
+        <!-- product at the inspection spot -->
+        <rect x="245" y="180" width="90" height="82" rx="4" style="fill:var(--sheet);stroke:var(--ink)" stroke-width="2"/>
+        <text x="290" y="252" text-anchor="middle" class="mono" style="fill:var(--mute)">product</text>
+
+        <!-- arm + camera (rotates around the servo shaft at the product centre) -->
+        <g id="arm">
+          <polygon points="290,84 238,178 342,178" style="fill:var(--accent-soft)"/>
+          <line x1="290" y1="221" x2="290" y2="80" style="stroke:var(--accent)" stroke-width="6" stroke-linecap="round"/>
+          <rect x="272" y="54" width="36" height="24" rx="3" style="fill:var(--ink)"/>
+          <circle cx="290" cy="80" r="6" style="fill:var(--accent)"/>
+          <text x="314" y="70" class="mono" style="fill:var(--ink)">ESP32-CAM</text>
+        </g>
+
+        <!-- servo shaft (behind the product) -->
+        <circle cx="290" cy="221" r="9" style="fill:var(--sheet);stroke:var(--accent)" stroke-width="3" stroke-dasharray="4 3"/>
+        <circle cx="290" cy="221" r="3" style="fill:var(--accent)"/>
+        <text x="350" y="232" class="mono" style="fill:var(--mute)">MG995 shaft</text>
+        <text x="350" y="246" class="mono" style="fill:var(--mute)">(beside the belt)</text>
+      </svg>
+    </div>
+    <p class="caption" id="cap"></p>
+  </section>
+
+  <section>
+    <h2>How it works</h2>
+    <p class="note" style="margin:0 0 12px">The servo stands beside the belt with its shaft lined up with the centre of the product. The camera sits at the end of the arm and always points back at the shaft. When the arm swings, the camera circles the product and stays aimed at it, so one servo gives the top view and the front view. It can also take a back view.</p>
+    <p class="note" style="margin:0 0 12px">Measured on the rig: <b>front 0°</b>, <b>top 63°</b>, <b>back 120°</b>, arm speed 120°/s. The drawing shows the idea; these are the real servo angles.</p>
+  </section>
+
+  <section>
+    <h2>One product, start to finish</h2>
+    <ol class="steps">
+      <li>The product reaches the inspection spot. A sensor sees it and the belt stops.</li>
+      <li>The arm is up (63°). The camera takes the <b>top</b> photo.</li>
+      <li>The arm swings to 0°. The camera is now level with the product and takes the <b>front</b> photo.</li>
+      <li>The arm swings back up, which clears the belt.</li>
+      <li>The S3 checks both photos and shows PASS or FAIL on the OLED and the output pins.</li>
+      <li>The belt starts again and the next product comes in.</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>Parts</h2>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Part</th><th>Where</th><th>Job</th></tr></thead>
+        <tbody>
+          <tr><td>ESP32-CAM</td><td>End of the arm</td><td>Takes the photos and sends them to the S3</td></tr>
+          <tr><td>MG995 servo</td><td>Stand beside the belt, shaft at product-centre height</td><td>Swings the camera between back, top and front</td></tr>
+          <tr><td>ESP32-S3</td><td>Control box</td><td>Runs the inspection, moves the servo, drives OLED and outputs</td></tr>
+          <tr><td>OLED 1.3"</td><td>On the control box</td><td>Shows PASS / FAIL and status</td></tr>
+          <tr><td>PASS / FAIL outputs</td><td>S3 GPIO7 / GPIO6</td><td>To LEDs, a relay or a PLC</td></tr>
+          <tr><td>Conveyor + motor</td><td>Under everything</td><td>Moves products<span class="tbd">open</span></td></tr>
+          <tr><td>Product sensor</td><td>At the inspection spot</td><td>Tells the S3 a product has arrived<span class="tbd">open</span></td></tr>
+          <tr><td>Servo supply</td><td>Near the servo</td><td>5–6 V, 2 A+, GND shared with the S3</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Open questions</h2>
+    <ul class="questions">
+      <li>Does the belt stop for each product, or keep moving while photos are taken?</li>
+      <li>How does the S3 know a product has arrived: IR sensor, the camera itself, or a timer?</li>
+      <li>Who controls the conveyor motor: the S3, or does it run on its own?</li>
+      <li>Which views matter: top only, top + front, or all three?</li>
+      <li>What size are the products? Arm length depends on this.</li>
+      <li>Lighting: fixed LEDs on the cell, or the ESP32-CAM flash?</li>
+      <li>What happens to a FAIL: just a signal, or a pusher that knocks it off the belt?</li>
+    </ul>
+    <p class="note">Rough sizing: the ESP32-CAM sees about 60° across. With a 15 cm arm, a photo covers about 15 cm at the product, so products up to about 10 cm fit with some margin.</p>
+  </section>
+</main>
+
+<script>
+(function () {
+  var arm = document.getElementById('arm');
+  var cap = document.getElementById('cap');
+  var text = {
+    '-90': '<b>Back view, servo 120°.</b> The arm points upstream at product height and the camera looks at the back face.',
+    '0': '<b>Top view, servo 63°.</b> The arm points straight up and the camera looks down on the product. The belt path is clear.',
+    '90': '<b>Front view, servo 0°.</b> The arm points downstream at product height and the camera looks at the front face.'
+  };
+  var buttons = document.querySelectorAll('.poses button');
+  function set(rot) {
+    arm.style.transform = 'rotate(' + rot + 'deg)';
+    cap.innerHTML = text[rot];
+    buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.rot === rot ? 'true' : 'false'); });
+  }
+  buttons.forEach(function (b) { b.addEventListener('click', function () { set(b.dataset.rot); }); });
+  set('0');
+})();
+</script>
